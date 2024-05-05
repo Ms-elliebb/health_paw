@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:health_paw2/pages/petPage.dart';
+import 'package:health_paw2/src/newPet_form.dart';
+import 'package:health_paw2/src/pet_profile_data.dart';
 
 void main() => runApp(MyApp());
 
@@ -9,13 +11,31 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Evcil Dostlarım',
-      home: PetProfilePage(),
+      home: PetProfilesPage(),
     );
   }
 }
 
-class PetProfilePage extends StatelessWidget {
-  final String buttonText="Köpük";
+class PetProfilesPage extends StatefulWidget {
+  @override
+  _PetProfilesPageState createState() => _PetProfilesPageState();
+}
+
+class _PetProfilesPageState extends State<PetProfilesPage> {
+  List<PetProfile> petProfiles = []; // Profil Listesi
+
+  void _addNewPetProfile() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => NewPetForm()),
+    );
+    if (result != null) {
+      setState(() {
+        petProfiles.add(result); // yeni profili listeye ekle
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,66 +46,43 @@ class PetProfilePage extends StatelessWidget {
         elevation: 0,
         leading: Icon(Icons.menu),
       ),
-      body: Container(
-        width: MediaQuery.of(context).size.width,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            SizedBox(height: 20),  // Spacer
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10.0),
-                    child: CircleAvatar(
-                      
-                      radius: 55,
-                      
-                      backgroundImage:AssetImage('lib/images/kopuk.jpg'),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=>PetPage(pageTitle: buttonText)),
-                        );
-
-                    }, 
-                    child: Text('Köpük',style: TextStyle(color: Colors.black,fontSize: 20,),),
-                    style: ElevatedButton.styleFrom(
-                    side: BorderSide(style: BorderStyle.none,),  
-                    shadowColor: Colors.black87,  
-                    backgroundColor: Color.fromRGBO(255, 0, 5, 0.8),
-                    padding: EdgeInsets.symmetric(horizontal: 105,vertical: 20),
-                                   
-                                        
-                    ),),
-                  )
-                ],
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: ListView.builder(
+              itemCount: petProfiles.length,
+              itemBuilder: (context, index) {
+                PetProfile profile = petProfiles[index];
+                return ListTile(
+                  title: Text(profile.name),
+                  subtitle: Text('Doğum Yeri: ${profile.birthPlace}'),
+                  onTap: () {
+                    // Profil detay sayfasına geçiş yap
+                  },
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(35.0),
+            child: ElevatedButton(
+              onPressed: _addNewPetProfile,
+              child: Text(
+                'Yeni bir evcil dostum var!',
+                style: TextStyle(color: Colors.black),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color.fromRGBO(255, 0, 5, 0.8),
+                padding: EdgeInsets.all(15.0),
+                textStyle: TextStyle(fontSize: 18),
               ),
             ),
-            
-            Spacer(),  // Takes all available space
-            Padding(
-              padding: const EdgeInsets.all(35.0),
-              child: ElevatedButton(
-                onPressed: () {},
-                child: Text('Yeni bir evcil dostum var!',style: TextStyle(color: Colors.black),),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color.fromRGBO(255, 0, 5, 0.8),
-                  padding: EdgeInsets.all(15.0),
-                  textStyle: TextStyle(fontSize: 18),
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
+
+
 
